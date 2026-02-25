@@ -1,4 +1,5 @@
 import torch
+import yaml
 from datasets import load_dataset
 from transformers import (
     AutoModelForCausalLM,
@@ -8,8 +9,9 @@ from transformers import (
     Trainer
 )
 from peft import LoraConfig, get_peft_model, PeftModel
-
-model_name = "vngrs-ai/Kumru-2B-Base"
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+model_name = config["model"]["name"]
 
 #--4-bit config--------------------------------------------------------------------------------------------
 bnb_config = BitsAndBytesConfig(
@@ -37,9 +39,9 @@ tokenizer.padding_side = "right"
 # --LoRA config--------------------------------------------------------------------------------------------
 
 lora_config = LoraConfig(
-    r=8,
-    lora_alpha=16,
-    lora_dropout=0.05,
+    r=config["lora"]["r"],
+    lora_alpha=config["lora"]["alpha"],
+    lora_dropout=config["lora"]["dropout"],
     bias="none",
     task_type="CAUSAL_LM",
 )
@@ -51,14 +53,14 @@ model.print_trainable_parameters()
 
 #-----------------------------------------------------------------------------------------------------------
 
-dataset = load_dataset("json", data_files="sampledata.jsonl", split="train")                   #<---- in data_files, you can include your own dataset
+dataset = load_dataset("json", data_files=config["data"]["file"], split="train")                   #<---- in data_files, you can include your own dataset
 def format_prompt(example):
     prompt = example['text'] + tokenizer.eos_token
   
     result = tokenizer(
         prompt,
         truncation=True,  
-        max_length=512,                                   #<-----you can change this if you want shorter answers.
+        max_length= config["model"]["max_length"],                                  
         padding=False,
     )
 
@@ -69,11 +71,11 @@ tokenized_dataset = dataset.map(format_prompt)
 
 #------------------------------------------------------------------------------------------------------------
 training_args = TrainingArguments(
-    output_dir="./training-checkpoints", 
-    per_device_train_batch_size=1, 
-    gradient_accumulation_steps=4, 
-    num_train_epochs=10,                        
-    learning_rate=2e-4,
+    output_dir=config["training"]["output_dir"], 
+    per_device_train_batch_size=config["training"]["batch_size"], 
+    gradient_accumulation_steps=config["training"]["gradient_accumulation_steps"], 
+    num_train_epochs=config["training"]["epochs"],                        
+    learning_rate=config["training"]["learning_rate"],
     fp16=True, 
     logging_steps=10,
     save_strategy="epoch",
@@ -91,7 +93,7 @@ trainer = Trainer(
 print("Starting training...")
 trainer.train()
 
-final_adapter_path = "./kumru-2B-finetuned"
+final_adapter_path = config["final"]["adapter_path"]
 trainer.save_model(final_adapter_path)
 
 print(f"Training complete! Your new model adapter is saved in: {final_adapter_path}")
