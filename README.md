@@ -5,7 +5,7 @@ This is a simple supervised fine-tuning example using a labeled dataset, shaping
 ## Overview
 This project applies **LoRA fine-tuning** to the chosen model, using a custom created JSONL dataset. The goal was to observe the training process and the outcome, turning a base model into a chatbot with a personality.
 
-- Original dataset is not included. A sample dataset given for demonstration is included in 'data/sample_data.jsonl'
+- Original dataset is not included. A sample dataset given for demonstration is included in `data/sample_data.jsonl`
 
 ## Model
 
@@ -13,7 +13,8 @@ The language model i prefered is **Kumru-2B-Base** by **VNGRS AI** *(https://hug
 
 ## Requirements
 - Python 3.13+
-- CUDA compatible GPU
+- CUDA compatible GPU (13.x)
+- Minimum 6GB VRAM recommended (4-bit quantization enabled for low VRAM support)
 
 ## How to Use
 1. Train the model: `python train.py`
