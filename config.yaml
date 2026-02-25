@@ -16,3 +16,6 @@ training:
 
 data:
   file: "sampledataset.jsonl"
+
+final:
+  adapter_path= "./kumru-2B-finetuned"
