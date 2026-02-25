@@ -2,9 +2,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import PeftModel
 import torch
 from collections import deque
+import yaml
 
-model_name = "vngrs-ai/Kumru-2B-Base"
-adapter_model_path = "./kumru-2B-finetuned"
+with open("config.yaml", "r"= as f:
+    config = yaml.safe_load(f)
+
+model_name = config["model"]["name"]
+adapter_model_path = config["adapter"]["adapter_path"]
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 #-----------------------------------------------------------------------------
@@ -39,8 +43,8 @@ def complete_text(starting_text, long_term_memory="", short_term_memory="\n"):
                                       repetition_penalty = 1.1,
                                       no_repeat_ngram_size = 5,
                                       do_sample=True,
-                                      temperature=0.58,                                   #Determines the randomness of the answers. keep between 1-0 where 1 is the most random.
-                                      top_p=0.84,                                         #Determines the variance in vocabulary. keep between 1-0 where 1 is the most various.
+                                      temperature=config["tokens"]["temperature"],                 #Determines the randomness of the answers. keep between 1-0 where 1 is the most random.
+                                      top_p=["tokens"]["top_p"],                         #Determines the variance in vocabulary. keep between 1-0 where 1 is the most various.
                                       pad_token_id=tokenizer.eos_token_id,
                                       eos_token_id=tokenizer.eos_token_id
                                      )
@@ -55,7 +59,7 @@ def complete_text(starting_text, long_term_memory="", short_term_memory="\n"):
 # ---This is for an external long term memory in text format if it already exists --------------------------------------------
 #----If there already exists a txt file, type 'memory' when you run the code if you'd like to add more to the memory file-----
 
-def load_user_memory(filepath="kmrbase_memory.txt"):
+def load_user_memory(filepath=config["data"]["external_memory"]):
     """Reads a text file and formats its content into a single prompt string."""
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -73,22 +77,21 @@ def load_user_memory(filepath="kmrbase_memory.txt"):
         return ""
       
 #---------------------------------------------------------------------------
-def save_user_memory(new_fact, filepath="kmrbase_memory.txt"):
+def save_user_memory(new_fact, filepath=config["data"]["external_memory"]):
     
     with open(filepath, 'a', encoding='utf-8') as f:
         f.write(new_fact + "\n")
 
 memory_context = load_user_memory()
 chat_history = deque(maxlen=8)
-print("-"*40, "\nKumru 2B-Base, Hello\nWrite 'exit' to leave the program\nWrite 'memory' to store data\n", "-"*40)   #<--------important after you run the main code
-
+print("-"*40, "\nHello! Let's Chat!\nWrite 'exit' to leave the program\nWrite 'memory' to store data\n", "-"*40)   #<--------important after you run the main code
 
 while True:
     starting_text = input("user: ")
     if starting_text.lower() in ["exit", "quit"]:
         break
     elif starting_text.lower() in ["clear memory", "clear mem", "cls mem"]:
-        with open("kmrbase_memory.txt", 'w', encoding='utf-8') as f:
+        with open(config["data"]["external_memory"], 'w', encoding='utf-8') as f:
             f.write("")
         memory_context = load_user_memory()
         print("Memory cleared.")
@@ -105,7 +108,7 @@ while True:
     short_term_memory = "".join(chat_history)
 
     generated_text = complete_text(new_prompt_part, memory_context, short_term_memory)
-    
+     
 
     generated_text = generated_text.replace("</s>", "").strip() 
 
