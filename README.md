@@ -5,7 +5,7 @@ This is a really easy supervised fine-tuning example using a labeled dataset, sh
 ## Overview
 This project applies **LoRA fine-tuning** to the chosen model, using a custom created JSONL dataset. The goal was to observe the training process and the outcome, turning a base model into a chatbot with a personality.
 
-- Original dataset is not included. A sample dataset is given for demonstration is included in 'data/sample_data.jsonl'
+- Original dataset is not included. A sample dataset given for demonstration is included in 'data/sample_data.jsonl'
 
 ## Model
 
