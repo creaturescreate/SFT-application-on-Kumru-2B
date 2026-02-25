@@ -7,6 +7,10 @@ lora:
   alpha: 16
   dropout: 0.05
 
+tokens:
+  temperature: 0.6
+  top_p: 0.84
+
 training:
   epochs: 10
   batch_size: 1
@@ -16,6 +20,8 @@ training:
 
 data:
   file: "sampledataset.jsonl"
+  external_memory: "externalmem.txt"
 
-final:
+adapter:
   adapter_path= "./kumru-2B-finetuned"
+
