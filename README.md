@@ -1,6 +1,6 @@
 # Supervised Fine-Tuning on a Language Model
 
-This is a really easy supervised fine-tuning example using a labeled dataset, shaping an under-trained base language model into a chatbot with a personality. 
+This is a simple supervised fine-tuning example using a labeled dataset, shaping an under-trained base language model into a chatbot with a personality. 
 
 ## Overview
 This project applies **LoRA fine-tuning** to the chosen model, using a custom created JSONL dataset. The goal was to observe the training process and the outcome, turning a base model into a chatbot with a personality.
@@ -16,8 +16,8 @@ The language model i prefered is **Kumru-2B-Base** by **VNGRS AI** *(https://hug
 - CUDA compatible GPU
 
 ## How to Use
-1. Train the model: 'python train.py'
-2. Interact: 'python main.py'
+1. Train the model: `python train.py`
+2. Interact: `python main.py`
 
 
 
